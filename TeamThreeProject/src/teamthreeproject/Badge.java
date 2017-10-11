@@ -31,6 +31,6 @@ public class Badge {
     }
     
     public String toString() {
-        
+        return "";
     }
 }
