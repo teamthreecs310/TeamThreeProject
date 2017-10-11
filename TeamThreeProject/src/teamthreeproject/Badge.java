@@ -8,10 +8,29 @@ import java.util.*;
 
 /**
  *
- * @author Travis
+ * @author Team Three
  */
 public class Badge {
     private String id;
     private String name;
     
+    public void setID(String s) {
+        this.id = s;
+    }
+
+    public void setName(String n) {
+        this.name = n;
+    }
+    
+    public String getID() {
+        return this.id;
+    }
+    
+    public String getName() {
+        return this.name;
+    }
+    
+    public String toString() {
+        
+    }
 }
