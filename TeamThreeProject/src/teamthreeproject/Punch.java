@@ -7,25 +7,33 @@ import java.util.*;
  */
 public class Punch {
 
-    private String adjustedTime;
+    private String adjusted_time_stamp;
     private String id;
     private String terminal_id;
     private String event_type_id;
     private String badge_id;
-    private String orignal_time_stamp;
+    private String original_time_stamp;
+    private String event_data;
     private Calendar calendar;
     
     
-    public Punch(String adjustedTime, String id, String terminal_id, String event_type_id, 
-                 String badge_id, String original_time_stamp) {
+    public Punch(String id, String terminal_id, String badge_id,
+                 String original_time_stamp, String event_type_id, 
+                 String event_data, String adjusted_time_stamp) {
         
-        calendar = toGregorian(orignal_time_stamp);
-        this.adjustedTime = adjustedTime;
+        calendar = toGregorian(original_time_stamp);
+        this.id = id;
+        this.terminal_id = terminal_id;
+        this.badge_id = badge_id;
+        
+        this.adjusted_time_stamp = adjusted_time_stamp;
         this.badge_id = badge_id;
         this.event_type_id = event_type_id;
         this.id = id;
-        this.orignal_time_stamp = orignal_time_stamp;
+        this.original_time_stamp = original_time_stamp;
         this.terminal_id = terminal_id;
+        this.event_data = event_data;
+        
         
     }
     
@@ -53,15 +61,15 @@ public class Punch {
     }
     
     public String printOrignalTimeStamp() {
-        
+        return "";
     }
     
     public void setAdjustedTime(String adj_time){
-        adjustedTime = adj_time;
+        adjusted_time_stamp = adj_time;
     }
    
     public String printAdjustedTime(){
-        return adjustedTime;
+        return adjusted_time_stamp;
        
     }
     
