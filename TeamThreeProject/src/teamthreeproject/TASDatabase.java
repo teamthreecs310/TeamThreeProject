@@ -30,6 +30,8 @@ public class TASDatabase {
         } catch (Exception e) {}
     }
     public Punch getPunch(int id){
+        Punch punch = new Punch();
+        punch.setID(id);
         try{
             prepstate = conn.prepareStatement("SELECT terminalid, badgeid, "
                                                + "originaltimestamp, eventtypeid, "
@@ -39,13 +41,17 @@ public class TASDatabase {
             result = prepstate.executeQuery();
             if(result != null){
                 result.next();
-                Punch punch = new Punch(result.toString("terminalid",
-                        result.toString("badgeid"), result.toString("originaltimestamp")
-                        , result.toString("eventtypeid"), result.toString("eventdata")
-                        , result.toString("adjustedtimestamp"))
+                punch.setTerminalID(result.getString("terminalid"));
+                punch.setBadgeID(result.getString("badgeid"));
+                punch.setOriginalTimeStamp(result.getString("originaltimestamp"));
+                punch.setEventTypeID(result.getString("eventtypeid"));
+                punch.setEventData(result.getString("eventdata"));
+                punch.setAdjustedTimeStamp(result.getString("adjustedtimestamp"));
             }
-        }
-        
+            result.close();
+            prepstate.close();
+        }catch(Exception e){}
+        return punch;
     }
     public Shift getShift(int id) {
         
