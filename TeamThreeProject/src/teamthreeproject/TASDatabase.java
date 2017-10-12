@@ -29,7 +29,24 @@ public class TASDatabase {
             conn.close();
         } catch (Exception e) {}
     }
-    
+    public Punch getPunch(int id){
+        try{
+            prepstate = conn.prepareStatement("SELECT terminalid, badgeid, "
+                                               + "originaltimestamp, eventtypeid, "
+                                               + "eventdata, adjusttimestamp "
+                                               + "FROM punch WHERE id = ?");
+            prepstate.setInt(1,id);
+            result = prepstate.executeQuery();
+            if(result != null){
+                result.next();
+                Punch punch = new Punch(result.toString("terminalid",
+                        result.toString("badgeid"), result.toString("originaltimestamp")
+                        , result.toString("eventtypeid"), result.toString("eventdata")
+                        , result.toString("adjustedtimestamp"))
+            }
+        }
+        
+    }
     public Shift getShift(int id) {
         
         //Create new shift rules object according to shift ID entered
