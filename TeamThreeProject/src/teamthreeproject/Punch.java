@@ -72,12 +72,14 @@ public class Punch {
     public String getEventType(String event_type_id) {
         if (event_type_id.equals("0")) 
             return "Clocked Out: ";
-        else if (event_type_id.equals("1")) 
+        else if (event_type_id.equals("1"))
             return "Clocked In: ";
         else 
             return "Timed Out: ";
     }
-    
+    public String printOriginalTimeStamp(){
+        return badge_id + " CLOCKED IN: " + toGregorian(original_time_stamp);
+    }
     
     
     
