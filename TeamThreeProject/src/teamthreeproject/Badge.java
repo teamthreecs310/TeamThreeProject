@@ -30,7 +30,8 @@ public class Badge {
         return this.description;
     }
     
+    @Override
     public String toString() {
-        return "";
+        return "# " + getID() + "(" + getDescription() + ")";
     }
 }
