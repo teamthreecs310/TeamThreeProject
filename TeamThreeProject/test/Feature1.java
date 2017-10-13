@@ -48,17 +48,17 @@ public class Feature1 {
 		
 		/* Compare to Expected Values */
 
-        assertEquals(p1.printOriginalTimestamp(), "#D2C39273 CLOCKED IN: WED 09/06/2017 07:00:07");
-        assertEquals(p2.printOriginalTimestamp(), "#DFD9BB5C CLOCKED IN: TUE 09/05/2017 08:00:00");
-        assertEquals(p3.printOriginalTimestamp(), "#99F0C0FA CLOCKED IN: SAT 08/19/2017 06:00:00");
+        assertEquals(p1.printOriginalTimeStamp(), "#D2C39273 CLOCKED IN: WED 09/06/2017 07:00:07");
+        assertEquals(p2.printOriginalTimeStamp(), "#DFD9BB5C CLOCKED IN: TUE 09/05/2017 08:00:00");
+        assertEquals(p3.printOriginalTimeStamp(), "#99F0C0FA CLOCKED IN: SAT 08/19/2017 06:00:00");
         
-        assertEquals(p4.printOriginalTimestamp(), "#0FFA272B CLOCKED OUT: MON 09/25/2017 17:30:04");
-        assertEquals(p5.printOriginalTimestamp(), "#FCE87D9F CLOCKED OUT: TUE 09/19/2017 17:34:00");
-        assertEquals(p6.printOriginalTimestamp(), "#FCE87D9F CLOCKED OUT: MON 08/21/2017 17:30:00");
+        assertEquals(p4.printOriginalTimeStamp(), "#0FFA272B CLOCKED OUT: MON 09/25/2017 17:30:04");
+        assertEquals(p5.printOriginalTimeStamp(), "#FCE87D9F CLOCKED OUT: TUE 09/19/2017 17:34:00");
+        assertEquals(p6.printOriginalTimeStamp(), "#FCE87D9F CLOCKED OUT: MON 08/21/2017 17:30:00");
         
-        assertEquals(p7.printOriginalTimestamp(), "#618072EA TIMED OUT: FRI 08/11/2017 00:12:35");
-        assertEquals(p8.printOriginalTimestamp(), "#0886BF12 TIMED OUT: THU 08/03/2017 06:06:38");
-        assertEquals(p9.printOriginalTimestamp(), "#67637925 TIMED OUT: TUE 08/08/2017 23:12:34");
+        assertEquals(p7.printOriginalTimeStamp(), "#618072EA TIMED OUT: FRI 08/11/2017 00:12:35");
+        assertEquals(p8.printOriginalTimeStamp(), "#0886BF12 TIMED OUT: THU 08/03/2017 06:06:38");
+        assertEquals(p9.printOriginalTimeStamp(), "#67637925 TIMED OUT: TUE 08/08/2017 23:12:34");
         
     }
     
