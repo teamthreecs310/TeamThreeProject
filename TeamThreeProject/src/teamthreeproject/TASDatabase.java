@@ -108,4 +108,27 @@ public class TASDatabase {
         return shift;
     }
     
+    public Badge getBadge(String id) {
+        
+        Badge badge = new Badge();
+        badge.setID(id);
+        
+        try {
+            prepstate = conn.prepareStatement("SELECT * FROM badge WHERE id = ?");
+            prepstate.setString(1, id);
+            result = prepstate.executeQuery();            
+            if (result != null) {
+                result.next();
+                badge.setDescription(result.getString("description"));
+                
+            }
+            result.close();
+            prepstate.close();
+  
+        } catch (Exception e) {}
+        
+        
+        return badge;
+    }
+    
 }
