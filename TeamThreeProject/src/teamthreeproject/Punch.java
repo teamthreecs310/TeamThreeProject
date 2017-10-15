@@ -3,7 +3,7 @@ package teamthreeproject;
 import java.util.*;
 /**
  *
- * @author Travis , Kyle 
+ * @author TeamThree
  */
 public class Punch {
 
@@ -16,14 +16,15 @@ public class Punch {
     private String event_data;
     private Calendar calendar;
     
-    private Calendar toGregorian(String orignal_time_stamp) {
+    private Calendar toGregorian(String original_time_stamp) {
         
-        int year = Integer.parseInt(orignal_time_stamp.substring(0,4));
-        int month = Integer.parseInt(orignal_time_stamp.substring(5,7));
-        int day = Integer.parseInt(orignal_time_stamp.substring(8,10));
-        int hour = Integer.parseInt(orignal_time_stamp.substring(11,13));
-        int minute = Integer.parseInt(orignal_time_stamp.substring(14,16));
-        int second = Integer.parseInt(orignal_time_stamp.substring(17,19));
+        // fix formatting using Gregorian Calendar objects and getTimeInMillis()
+        int year = Integer.parseInt(original_time_stamp.substring(0,4));
+        int month = Integer.parseInt(original_time_stamp.substring(5,6));
+        int day = Integer.parseInt(original_time_stamp.substring(8,10));
+        int hour = Integer.parseInt(original_time_stamp.substring(11,13));
+        int minute = Integer.parseInt(original_time_stamp.substring(14,16));
+        int second = Integer.parseInt(original_time_stamp.substring(17,19));
         
         calendar = GregorianCalendar.getInstance();
         calendar.set(year, month, day, hour, minute, second);
@@ -78,7 +79,7 @@ public class Punch {
             return "Timed Out: ";
     }
     public String printOriginalTimeStamp(){
-        return badge_id + " CLOCKED IN: " + toGregorian(original_time_stamp);
+        return badge_id + " CLOCKED IN: " + toGregorian(getOriginalTimeStamp());
     }
     
     
