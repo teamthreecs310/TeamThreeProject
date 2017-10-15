@@ -81,8 +81,7 @@ public class TASDatabase {
     
     public Badge getBadge(String id) {
         
-        Badge badge = new Badge();
-        badge.setID(id);
+        Badge badge = null;
         
         try {
             prepstate = conn.prepareStatement("SELECT * FROM badge WHERE id = ?");
@@ -90,8 +89,7 @@ public class TASDatabase {
             result = prepstate.executeQuery();            
             if (result != null) {
                 result.next();
-                badge.setDescription(result.getString("description"));
-                
+                badge = new Badge(result.getString("id"), result.getString("description"));               
             }
             result.close();
             prepstate.close();
