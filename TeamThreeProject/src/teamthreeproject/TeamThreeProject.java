@@ -13,6 +13,10 @@ public class TeamThreeProject {
         
         TASDatabase db = new TASDatabase();
         
+        Punch p1 = db.getPunch(42);
+        
+        System.out.println(p1.printOriginalTimeStamp());
+        
         db.closeConnection();
     
     }

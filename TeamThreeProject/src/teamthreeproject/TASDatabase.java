@@ -31,25 +31,21 @@ public class TASDatabase {
     }
     public Punch getPunch(int id){
         Punch punch = null;
+        
         try{
-            prepstate = conn.prepareStatement("SELECT terminalid, badgeid, "
-                                               + "unix_timestamp(originaltimestamp),"
-                                               + " eventtypeid, "
-                                               + "eventdata, unix_timestamp(adjustedtimestamp) "
-                                               + "FROM event WHERE id = ?");
+            prepstate = conn.prepareStatement("SELECT id, terminalid, badgeid, unix_timestamp(originaltimestamp) AS ots,"
+                                            + "eventtypeid FROM event WHERE id = ?");
             prepstate.setInt(1,id);
             result = prepstate.executeQuery();
             if(result != null){
                 result.next();
-                punch = new Punch(result.getInt("id"),result.getInt("terminalid"), result.getString("badgeid"),
-                                        result.getLong("unix_timestamp(original_timestamp)"),
-                                        result.getInt("eventtypeid"), result.getInt("eventdata"),
-                                        result.getLong("unix_timestamp(adjustedtimestamp)"));
-                                        
+                punch = new Punch(id, result.getInt("terminalid"), result.getString("badgeid"), 
+                                  result.getLong("ots"), result.getInt("eventtypeid"));
             }
             result.close();
             prepstate.close();
-        }catch(Exception e){}
+        } catch(Exception e){System.out.println("Failed to get result");}
+        
         return punch;
     }
     public Shift getShift(int id) {
@@ -63,7 +59,7 @@ public class TASDatabase {
             result = prepstate.executeQuery();            
             if (result != null) {
                 result.next();
-                shift = new Shift(result.getInt("id"), result.getString("description"),
+                shift = new Shift(id, result.getString("description"),
                         result.getString("start"), result.getString("stop"),
                         result.getInt("interval"), result.getInt("graceperiod"),
                         result.getInt("dock"), result.getString("lunchstart"),
