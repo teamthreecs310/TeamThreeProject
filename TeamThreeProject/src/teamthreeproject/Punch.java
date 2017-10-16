@@ -8,7 +8,7 @@ import java.text.*;
  */
 public class Punch {
 
-    //private Calendar adjusted_time_stamp;
+    private Calendar adjusted_time_stamp;
     private int punch_id;
     private int terminal_id;
     private int event_type_id;
@@ -24,6 +24,15 @@ public class Punch {
         this.badge_id = badge_id;
         this.ots = ots;
         this.event_type_id = event_type_id;
+    }
+    
+    public Punch(String badgeid, int terminalid, int punchtypeid) {
+        original_time_stamp = Calendar.getInstance();
+        adjusted_time_stamp = null;
+        punch_id = 0;
+        this.badge_id = badgeid;
+        this.terminal_id = terminalid;
+        this.event_type_id = punchtypeid;
     }
     
     public int getID(){
