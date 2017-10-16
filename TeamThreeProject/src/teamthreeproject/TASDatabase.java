@@ -18,7 +18,7 @@ public class TASDatabase {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             String url = "jdbc:mysql://localhost:3306/tas";
             String username = "root";//Kept empty for now because we will be Creating a project user 
-            String password = "";//Kept empty for now because we will be Creating a project user                 
+            String password = "norris699601";//Kept empty for now because we will be Creating a project user                 
             conn = DriverManager.getConnection(url, username, password);
         } catch(Exception e){}
         
@@ -30,23 +30,22 @@ public class TASDatabase {
         } catch (Exception e) {}
     }
     public Punch getPunch(int id){
-        Punch punch = new Punch();
-        punch.setID(id);
+        Punch punch = null;
         try{
             prepstate = conn.prepareStatement("SELECT terminalid, badgeid, "
-                                               + "originaltimestamp, eventtypeid, "
-                                               + "eventdata, adjusttimestamp "
-                                               + "FROM punch WHERE id = ?");
+                                               + "unix_timestamp(originaltimestamp),"
+                                               + " eventtypeid, "
+                                               + "eventdata, unix_timestamp(adjustedtimestamp) "
+                                               + "FROM event WHERE id = ?");
             prepstate.setInt(1,id);
             result = prepstate.executeQuery();
             if(result != null){
                 result.next();
-                punch.setTerminalID(result.getString("terminalid"));
-                punch.setBadgeID(result.getString("badgeid"));
-                punch.setOriginalTimeStamp(result.getString("originaltimestamp"));
-                punch.setEventTypeID(result.getString("eventtypeid"));
-                punch.setEventData(result.getString("eventdata"));
-                punch.setAdjustedTimeStamp(result.getString("adjustedtimestamp"));
+                punch = new Punch(result.getInt("id"),result.getInt("terminalid"), result.getString("badgeid"),
+                                        result.getLong("unix_timestamp(original_timestamp)"),
+                                        result.getInt("eventtypeid"), result.getInt("eventdata"),
+                                        result.getLong("unix_timestamp(adjustedtimestamp)"));
+                                        
             }
             result.close();
             prepstate.close();
