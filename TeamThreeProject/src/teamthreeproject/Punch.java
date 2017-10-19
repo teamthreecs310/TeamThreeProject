@@ -13,8 +13,8 @@ public class Punch {
     private int event_type_id;
     private String badge_id;
     private Long ots;
-    private Calendar original_time_stamp;
-    private Calendar adjusted_time_stamp;
+    private Calendar original_time_stamp = Calendar.getInstance();
+    private Calendar adjusted_time_stamp = Calendar.getInstance();;
     //private int event_data;
     
     //Constructor for retrieving existing punches in the database
@@ -53,7 +53,6 @@ public class Punch {
     }
     
     public Calendar getAdjustedTimestamp() {
-        adjusted_time_stamp = Calendar.getInstance();
         return adjusted_time_stamp;
     }
     
