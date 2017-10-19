@@ -13,9 +13,15 @@ public class TeamThreeProject {
         
         TASDatabase db = new TASDatabase();
         
-        Punch p1 = db.getPunch(42);
+        /* testing for adjust START */
+        Shift s1 = db.getShift(1);
+        Punch p1 = db.getPunch(3634);
         
-        System.out.println(p1.printOriginalTimeStamp());
+        p1.adjust(s1);
+        
+        System.out.println(p1.printOriginalTimestamp());
+        System.out.println(p1.printAdjustedTimestamp());
+        /* testing for adjust END */
         
         db.closeConnection();
     

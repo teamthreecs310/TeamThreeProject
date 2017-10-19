@@ -44,7 +44,7 @@ public class TASDatabase {
             }
             result.close();
             prepstate.close();
-        } catch(Exception e){System.out.println("Failed to get result");}
+        } catch(Exception e){}
         
         return punch;
     }
@@ -54,16 +54,18 @@ public class TASDatabase {
         
         //Retrieve shift rules from database and store info in new Shift object       
         try {
-            prepstate = conn.prepareStatement("SELECT * FROM shift WHERE id = ?");
+            prepstate = conn.prepareStatement("SELECT *, unix_timestamp(start) AS shift_start,"
+                    + "unix_timestamp(stop) AS shift_stop, unix_timestamp(lunchstart) AS l_start,"
+                    + "unix_timestamp(lunchstop) AS l_stop FROM shift WHERE id = ?");
             prepstate.setInt(1, id);
             result = prepstate.executeQuery();            
             if (result != null) {
                 result.next();
                 shift = new Shift(id, result.getString("description"),
-                        result.getString("start"), result.getString("stop"),
+                        result.getLong("shift_start"), result.getLong("shift_stop"),
                         result.getInt("interval"), result.getInt("graceperiod"),
-                        result.getInt("dock"), result.getString("lunchstart"),
-                        result.getString("lunchstop"), result.getInt("lunchdeduct"),
+                        result.getInt("dock"), result.getLong("l_start"),
+                        result.getLong("l_stop"), result.getInt("lunchdeduct"),
                         result.getInt("maxtime"), result.getInt("overtimethreshold"));
             }
             result.close();
@@ -93,6 +95,14 @@ public class TASDatabase {
         
         
         return badge;
+    }
+    
+    public int insertPunch(Punch p) {
+        int punch_id = 0;
+        
+        //TODO: Insert new punch in database and retrieve generated ID
+        
+        return punch_id;
     }
     
 }

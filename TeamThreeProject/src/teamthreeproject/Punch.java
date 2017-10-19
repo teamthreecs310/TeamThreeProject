@@ -8,24 +8,25 @@ import java.text.*;
  */
 public class Punch {
 
-    private Calendar adjusted_time_stamp;
     private int punch_id;
     private int terminal_id;
     private int event_type_id;
     private String badge_id;
-    private long ots;
-    private Calendar original_time_stamp = Calendar.getInstance();
+    private Long ots;
+    private Calendar original_time_stamp;
+    private Calendar adjusted_time_stamp;
     //private int event_data;
-    //private Calendar calendar;
     
-    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id){
+    //Constructor for retrieving existing punches in the database
+    public Punch(int id, int terminal_id, String badge_id, Long ots, int event_type_id){
         this.punch_id = id;
         this.terminal_id = terminal_id;
         this.badge_id = badge_id;
-        this.ots = ots;
+        this.ots = ots*1000;
         this.event_type_id = event_type_id;
     }
     
+    //Constructor for inserting new punches into the database
     public Punch(String badgeid, int terminalid, int punchtypeid) {
         original_time_stamp = Calendar.getInstance();
         adjusted_time_stamp = null;
@@ -45,14 +46,20 @@ public class Punch {
         return badge_id;
     }
     
-    public Calendar getOriginalTimeStamp() {
-        original_time_stamp.setTimeInMillis(ots*1000);
+    public Calendar getOriginalTimestamp() {
+        original_time_stamp = Calendar.getInstance();
+        original_time_stamp.setTimeInMillis(ots);
         return original_time_stamp;
+    }
+    
+    public Calendar getAdjustedTimestamp() {
+        adjusted_time_stamp = Calendar.getInstance();
+        return adjusted_time_stamp;
     }
     
     public String getDay() {
         String day = null;
-        switch (getOriginalTimeStamp().get(Calendar.DAY_OF_WEEK)) {
+        switch (getOriginalTimestamp().get(Calendar.DAY_OF_WEEK)) {
             case 1:
                 day = "SUN";
                 break;
@@ -83,12 +90,15 @@ public class Punch {
     public int getEventTypeID(){
         return event_type_id;
     }
+    
     //public int getEventData(){
         //return event_data;
     //}
-    //public Calendar getAdjustedTimeStamp(){
+    
+    //public Calendar getAdjustedTimestamp(){
         //return adjusted_time_stamp;
     //}
+    
     public String getEventType(int event_type_id) {
         switch (event_type_id) {
             case 0:
@@ -99,12 +109,44 @@ public class Punch {
                 return "TIMED OUT: ";
         }
     }
-    public String printOriginalTimeStamp(){
+    public String printOriginalTimestamp(){
         return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
-                (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getOriginalTimeStamp().getTime());
+                (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getOriginalTimestamp().getTime());
     }
     
+    public void adjust(Shift s) {
+        
+        /* for testing purposes only, will need to be remodeled (possibly with recursion for checking for timestamps way outside range
+        and adjusting to correct interval */
+        
+        if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
+            if (this.ots < s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
+                if (this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
+                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
+                }
+                else {
+                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
+                }
+            }
+            else {
+                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
+            }    
+        }
+        else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
+        }  
+    }
     
+    public String printAdjustedTimestamp() {
+        return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
+                (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getAdjustedTimestamp().getTime());
+    }
     
     
     
