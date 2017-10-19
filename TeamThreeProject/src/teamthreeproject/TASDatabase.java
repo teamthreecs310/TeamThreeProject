@@ -98,11 +98,11 @@ public class TASDatabase {
     }
     
     public int insertPunch(Punch p) {
-        int punch_id = 0;
+        
         
         //TODO: Insert new punch in database and retrieve generated ID
         
-        return punch_id;
+        return p.getID();
     }
     
 }
