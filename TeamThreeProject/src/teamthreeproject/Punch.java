@@ -47,7 +47,6 @@ public class Punch {
     }
     
     public Calendar getOriginalTimestamp() {
-        original_time_stamp = Calendar.getInstance();
         original_time_stamp.setTimeInMillis(ots);
         return original_time_stamp;
     }
