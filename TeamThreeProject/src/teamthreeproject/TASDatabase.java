@@ -50,26 +50,33 @@ public class TASDatabase {
         return punch;
     }
     public int insertPunch(Punch punch) {
-        int id = 0;
+        int punchid = 0;
         int result = 0;
+        ResultSet keys;
     try {
            String badgeid = punch.getBadgeID();
            int terminalid = punch.getTerminalID();
            int eventtypeid = punch.getEventTypeID();
-           String sql = "INSERT INTO event(badgeid, terminalid, eventtypeid) VALUES (?, ?, ?, ?)";
+           String sql = "INSERT INTO event(badgeid, originaltimestamp, terminalid, eventtypeid) VALUES (?, ?, ?, ?)";
            prepstate = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
            prepstate.setString(1, badgeid);
            prepstate.setString(2, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(punch.getOriginalTimestamp().getTime()));
            prepstate.setInt(3, terminalid);
            prepstate.setInt(4, eventtypeid);
-           id = prepstate.executeUpdate();
-       prepstate.close();
+           result = prepstate.executeUpdate();
+           if(result == 1){
+               keys = prepstate.getGeneratedKeys();
+               if(keys.next()){
+                   punchid = keys.getInt(1);
+               }
+           }
+           prepstate.close();
        }
        catch(Exception e){}
 
        //punch.setID(id);
-       System.out.println(""+id);
-       return id;
+       System.out.println(""+punchid);
+       return punchid;
     }
     public Shift getShift(int id) {
         ResultSet result;

@@ -13,22 +13,26 @@ public class Punch {
     private int event_type_id;
     private String badge_id;
     private Long ots;
-    private Calendar original_time_stamp = Calendar.getInstance();
-    private Calendar adjusted_time_stamp = Calendar.getInstance();;
+    private GregorianCalendar original_time_stamp;
+    private GregorianCalendar adjusted_time_stamp;
     //private int event_data;
     
     //Constructor for retrieving existing punches in the database
-    public Punch(int id, int terminal_id, String badge_id, Long ots, int event_type_id){
+    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id){
         this.punch_id = id;
         this.terminal_id = terminal_id;
         this.badge_id = badge_id;
         this.ots = ots*1000;
+        System.out.println("ots: " + ots);
         this.event_type_id = event_type_id;
+        this.original_time_stamp = new GregorianCalendar();
+        original_time_stamp.setTime(new Date(this.ots));
+        //System.out.println((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(original_time_stamp.getTime()));
     }
     
     //Constructor for inserting new punches into the database
     public Punch(String badgeid, int terminalid, int punchtypeid) {
-        original_time_stamp = Calendar.getInstance();
+        this.original_time_stamp = new GregorianCalendar();
         adjusted_time_stamp = null;
         punch_id = 0;
         this.badge_id = badgeid;
@@ -48,12 +52,11 @@ public class Punch {
         return badge_id;
     }
     
-    public Calendar getOriginalTimestamp() {
-        original_time_stamp.setTimeInMillis(ots);
+    public GregorianCalendar getOriginalTimestamp() {
         return original_time_stamp;
     }
     
-    public Calendar getAdjustedTimestamp() {
+    public GregorianCalendar getAdjustedTimestamp() {
         return adjusted_time_stamp;
     }
     
