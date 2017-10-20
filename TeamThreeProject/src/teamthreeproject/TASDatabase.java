@@ -2,6 +2,7 @@
 package teamthreeproject;
 import java.sql.*;
 import java.util.*;
+import java.text.*;
 
 /**
  *
@@ -18,7 +19,7 @@ public class TASDatabase {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             String url = "jdbc:mysql://localhost:3306/tas";
             String username = "root";//Kept empty for now because we will be Creating a project user 
-            String password = "CS310";//Kept empty for now because we will be Creating a project user                 
+            String password = "norris699601";//Kept empty for now because we will be Creating a project user                 
             conn = DriverManager.getConnection(url, username, password);
         } catch(Exception e){}
         
@@ -50,34 +51,28 @@ public class TASDatabase {
     }
     public int insertPunch(Punch punch) {
         int id = 0;
+        int result = 0;
     try {
            String badgeid = punch.getBadgeID();
            int terminalid = punch.getTerminalID();
            int eventtypeid = punch.getEventTypeID();
-           prepstate = conn.prepareStatement("INSERT INTO event(badgeid, terminalid, eventtypeid)"
-                   + "VALUES (?, ?, ?)");
+           String sql = "INSERT INTO event(badgeid, terminalid, eventtypeid) VALUES (?, ?, ?, ?)";
+           prepstate = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
            prepstate.setString(1, badgeid);
-           prepstate.setInt(2, terminalid);
-           prepstate.setInt(3, eventtypeid);
-           prepstate.executeUpdate();
-       result.close();
+           prepstate.setString(2, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(punch.getOriginalTimestamp().getTime()));
+           prepstate.setInt(3, terminalid);
+           prepstate.setInt(4, eventtypeid);
+           id = prepstate.executeUpdate();
        prepstate.close();
        }
        catch(Exception e){}
-       try{
-           prepstate = conn.prepareStatement("SELECT last_insert_id() FROM event");
-           result = prepstate.executeQuery();
-           id = result.getInt(1);
-           result.close();
-           prepstate.close();
-       }
-       catch(Exception e){}
+
        //punch.setID(id);
        System.out.println(""+id);
        return id;
     }
     public Shift getShift(int id) {
-        
+        ResultSet result;
         Shift shift = null;
         
         //Retrieve shift rules from database and store info in new Shift object       
@@ -105,7 +100,7 @@ public class TASDatabase {
     }
     
     public Badge getBadge(String id) {
-        
+        ResultSet result;
         Badge badge = null;
         
         try {
