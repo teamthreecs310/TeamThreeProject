@@ -16,6 +16,7 @@ public class TeamThreeProject {
         /* testing for adjust START */
         Shift s1 = db.getShift(1);
         Punch p1 = db.getPunch(3634);
+        db.insertPunch(p1);
         
         p1.adjust(s1);
         

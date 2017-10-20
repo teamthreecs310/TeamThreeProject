@@ -18,7 +18,7 @@ public class TASDatabase {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             String url = "jdbc:mysql://localhost:3306/tas";
             String username = "root";//Kept empty for now because we will be Creating a project user 
-            String password = "";//Kept empty for now because we will be Creating a project user                 
+            String password = "CS310";//Kept empty for now because we will be Creating a project user                 
             conn = DriverManager.getConnection(url, username, password);
         } catch(Exception e){}
         
@@ -47,6 +47,34 @@ public class TASDatabase {
         } catch(Exception e){}
         
         return punch;
+    }
+    public int insertPunch(Punch punch) {
+        int id = 0;
+    try {
+           String badgeid = punch.getBadgeID();
+           int terminalid = punch.getTerminalID();
+           int eventtypeid = punch.getEventTypeID();
+           prepstate = conn.prepareStatement("INSERT INTO event(badgeid, terminalid, eventtypeid)"
+                   + "VALUES (?, ?, ?)");
+           prepstate.setString(1, badgeid);
+           prepstate.setInt(2, terminalid);
+           prepstate.setInt(3, eventtypeid);
+           prepstate.executeUpdate();
+       result.close();
+       prepstate.close();
+       }
+       catch(Exception e){}
+       try{
+           prepstate = conn.prepareStatement("SELECT last_insert_id() FROM event");
+           result = prepstate.executeQuery();
+           id = result.getInt(1);
+           result.close();
+           prepstate.close();
+       }
+       catch(Exception e){}
+       //punch.setID(id);
+       System.out.println(""+id);
+       return id;
     }
     public Shift getShift(int id) {
         
@@ -96,13 +124,5 @@ public class TASDatabase {
         
         return badge;
     }
-    
-    public int insertPunch(Punch p) {
         
-        
-        //TODO: Insert new punch in database and retrieve generated ID
-        
-        return p.getID();
-    }
-    
 }

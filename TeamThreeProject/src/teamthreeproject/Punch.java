@@ -35,7 +35,9 @@ public class Punch {
         this.terminal_id = terminalid;
         this.event_type_id = punchtypeid;
     }
-    
+    public void setID(int id){
+        this.punch_id = id;
+    }
     public int getID(){
         return punch_id;
     }
