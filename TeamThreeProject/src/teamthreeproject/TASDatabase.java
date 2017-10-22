@@ -19,7 +19,7 @@ public class TASDatabase {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             String url = "jdbc:mysql://localhost:3306/tas";
             String username = "root";//Kept empty for now because we will be Creating a project user 
-            String password = "norris699601";//Kept empty for now because we will be Creating a project user                 
+            String password = "";//Kept empty for now because we will be Creating a project user                 
             conn = DriverManager.getConnection(url, username, password);
         } catch(Exception e){}
         
@@ -75,7 +75,7 @@ public class TASDatabase {
        catch(Exception e){}
 
        //punch.setID(id);
-       System.out.println(""+punchid);
+       System.out.println("Punch ID: "+punchid);
        return punchid;
     }
     public Shift getShift(int id) {

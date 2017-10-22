@@ -13,8 +13,8 @@ public class Punch {
     private int event_type_id;
     private String badge_id;
     private Long ots;
-    private GregorianCalendar original_time_stamp;
-    private GregorianCalendar adjusted_time_stamp;
+    private GregorianCalendar original_time_stamp = new GregorianCalendar();
+    private GregorianCalendar adjusted_time_stamp = new GregorianCalendar();
     //private int event_data;
     
     //Constructor for retrieving existing punches in the database
@@ -23,9 +23,8 @@ public class Punch {
         this.terminal_id = terminal_id;
         this.badge_id = badge_id;
         this.ots = ots*1000;
-        System.out.println("ots: " + ots);
+        //System.out.println("ots: " + ots);
         this.event_type_id = event_type_id;
-        this.original_time_stamp = new GregorianCalendar();
         original_time_stamp.setTime(new Date(this.ots));
         //System.out.println((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(original_time_stamp.getTime()));
     }
@@ -62,7 +61,7 @@ public class Punch {
     
     public String getDay() {
         String day = null;
-        switch (getOriginalTimestamp().get(Calendar.DAY_OF_WEEK)) {
+        switch (getOriginalTimestamp().get(GregorianCalendar.DAY_OF_WEEK)) {
             case 1:
                 day = "SUN";
                 break;
@@ -98,9 +97,6 @@ public class Punch {
         //return event_data;
     //}
     
-    //public Calendar getAdjustedTimestamp(){
-        //return adjusted_time_stamp;
-    //}
     
     public String getEventType(int event_type_id) {
         switch (event_type_id) {
@@ -123,25 +119,33 @@ public class Punch {
         and adjusting to correct interval */
         
         if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
+            //Time before 7:00
             if (this.ots < s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
+                //Time before 6:45
                 if (this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
+                    //Time before 6:30
                     getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
                 }
                 else {
+                    //Time between 6:45 and 6:30
                     getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
                 }
             }
             else {
+                //Time between 6:45 and 7:00
                 getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
             }    
         }
         else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
+            //Time between 7:00 and 7:05
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
         }
         else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
+            //Time between 7:05 and 7:15
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
         }
         else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
+            //Time between 7:15 and 7:30
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
         }  
     }
