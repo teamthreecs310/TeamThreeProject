@@ -119,33 +119,33 @@ public class Punch {
         and adjusting to correct interval */
         
         if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
-            //Time before 7:00
+            //Time is before shift start
             if (this.ots < s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
-                //Time before 6:45
+                //Time is 15 minutes or more before shift start
                 if (this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
-                    //Time before 6:30
+                    //Time is 30 minutes or more before shift start
                     getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
                 }
                 else {
-                    //Time between 6:45 and 6:30
+                    //Time is between 15 and 30 minutes before shift start
                     getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
                 }
             }
             else {
-                //Time between 6:45 and 7:00
+                //Time is between 15 minutes before and start of shift
                 getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
             }    
         }
         else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
-            //Time between 7:00 and 7:05
+            //Time falls within grace period (5 min)
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
         }
         else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
-            //Time between 7:05 and 7:15
+            //Time falls outside of grace period but within 15 minutes after start
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
         }
         else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
-            //Time between 7:15 and 7:30
+            //Time falls between 15 minutes and 30 minutes after start
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
         }  
     }

@@ -136,24 +136,6 @@ public class Shift {
         return lunch_start_IM;
     }
     
-    //(Lunch start + grace period) timestamp rule
-    public Long getLunchStartGraceInMillis(GregorianCalendar ots) {
-        lunch_start_grace_IM = getLunchStartInMillis(ots) + (getGracePeriod() * 60000);
-        return lunch_start_grace_IM;
-    }
-    
-    //(Lunch start - interval) timestamp rule
-    public Long getLunchStartIntervalInMillis(GregorianCalendar ots) {
-        lunch_start_interval_IM = getLunchStartInMillis(ots) - (getInterval() * 60000);
-        return lunch_start_interval_IM;
-    }
-    
-    //(Lunch start + dock) timestamp rule
-    public Long getLunchStartDockInMillis(GregorianCalendar ots) {
-        lunch_start_dock_IM = getLunchStartInMillis(ots) + (getDock() * 60000);
-        return lunch_start_dock_IM;
-    }
-    
     //retrieve Shift lunch stop time in Date format
     public Date getLunchStop() {
         return l_stop.getTime();
@@ -164,24 +146,6 @@ public class Shift {
         l_stop.set(ots.get(GregorianCalendar.YEAR), ots.get(GregorianCalendar.MONTH), ots.get(GregorianCalendar.DATE));
         lunch_stop_IM = l_start.getTimeInMillis();
         return lunch_stop_IM;
-    }
-    
-    //(Lunch stop - grace period) timestamp rule
-    public Long getLunchStopGraceInMillis(GregorianCalendar ots) {
-        lunch_stop_grace_IM = getLunchStopInMillis(ots) - (getGracePeriod() * 60000);
-        return lunch_stop_grace_IM;
-    }
-    
-    //(Lunch stop + interval) timestamp rule
-    public Long getLunchStopIntervalInMillis(GregorianCalendar ots) {
-        lunch_stop_interval_IM = getLunchStopInMillis(ots) + (getInterval() * 60000);
-        return lunch_stop_interval_IM;
-    }
-    
-    //(Lunch stop - dock) timestamp rule
-    public Long getLunchStopDockInMillis(GregorianCalendar ots) {
-        lunch_stop_dock_IM = getLunchStopInMillis(ots) - (getDock() * 60000);
-        return lunch_stop_dock_IM;
     }
     
     //Returns the interval of time that punches get adjusted to
