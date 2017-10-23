@@ -115,6 +115,19 @@ public class Punch {
     
     public void adjust(Shift s) {
         
+        //check if a clock-in and before lunch
+        //startShift(s);
+        
+        //check if clock-out and before lunch stop
+        //lunchStart(s);
+        
+        //check if clock-in and before shift stop
+        //lunchStop(s);
+        
+        //check if clock-out and after lunch stop
+        //stopShift(s);
+        
+        
         /* for testing purposes only, will need to be remodeled (possibly with recursion for checking for timestamps way outside range
         and adjusting to correct interval */
         
@@ -149,6 +162,8 @@ public class Punch {
             getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
         }  
     }
+    
+    
     
     public String printAdjustedTimestamp() {
         return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
