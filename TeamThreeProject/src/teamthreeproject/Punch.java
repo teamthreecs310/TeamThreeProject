@@ -133,91 +133,99 @@ public class Punch {
         /* for testing purposes only, will need to be remodeled (possibly with recursion for checking for timestamps way outside range
         and adjusting to correct interval */
         if(event_type_id == 1){
-            if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
+            adjustShiftStart(s);
+        } 
+        else if(event_type_id == 0){
+            adjustLunchStart(s);
+            adjustShiftStop(s);
+        }
+    }    
+    public void adjustShiftStart(Shift s){
+        if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
                 //Time is before shift start
-                if (this.ots < s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
+            if (this.ots < s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
                     //Time is 15 minutes or more before shift start
-                    if (this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
-                        //Time is 30 minutes or more before shift start
-                        getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
+                if (this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
+                    //Time is 30 minutes or more before shift start
+                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
+                }
+                else {
+                    //Time is between 15 and 30 minutes before shift start
+                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
+                }
+            }
+            else {
+                //Time is between 15 minutes before and start of shift
+                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
+            }    
+        }
+        else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
+            //Time falls within grace period (5 min)
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
+            //Time falls outside of grace period but within 15 minutes after start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
+            //Time falls between 15 minutes and 30 minutes before start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
+        }
+        if (this.ots > s.getStartTimeInMillis(getOriginalTimestamp())) {
+                //Time is After shift start
+            if (this.ots > s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
+                    //Time is 15 minutes or more After shift start
+                    if (this.ots > (s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000))) {
+                        //Time is 30 minutes or more After shift start
+                        getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000));
                     }
                     else {
-                        //Time is between 15 and 30 minutes before shift start
+                    //Time is between 15 and 30 minutes After shift start
                         getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
                     }
-                }
-                else {
+            }
+            else {
                     //Time is between 15 minutes before and start of shift
-                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
-                }    
-            }
-            else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
-                //Time falls within grace period (5 min)
                 getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
-                //Time falls outside of grace period but within 15 minutes after start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
-                //Time falls between 15 minutes and 30 minutes before start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
-            }
-            if (this.ots > s.getStartTimeInMillis(getOriginalTimestamp())) {
-                    //Time is After shift start
-                if (this.ots > s.getStartTimeIntervalInMillis(getOriginalTimestamp())) {
-                        //Time is 15 minutes or more After shift start
-                        if (this.ots > (s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000))) {
-                            //Time is 30 minutes or more After shift start
-                            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000));
-                        }
-                        else {
-                        //Time is between 15 and 30 minutes After shift start
-                            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp()));
-                        }
-                }
-                else {
-                        //Time is between 15 minutes before and start of shift
-                    getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
-                }    
-            }
-            else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
-                //Time falls within grace period (5 min)
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
-                //Time falls outside of grace period but within 15 minutes after start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
-                //Time falls between 15 minutes and 30 minutes before start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
-            }
+            }    
         }
-        else if(event_type_id == 0){
-            if(this.ots > s.getStopTimeInMillis(getOriginalTimestamp())) {
-                if(this.ots > s.getStopTimeIntervalInMillis(getOriginalTimestamp())) {
-                    if(this.ots > (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
-                        getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
-                    }
-                    else {
-                        getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp()));
-                    }
-                }
+        else if (this.ots < s.getStartTimeGraceInMillis(getOriginalTimestamp())) {
+            //Time falls within grace period (5 min)
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
+            //Time falls outside of grace period but within 15 minutes after start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < (s.getStartTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
+            //Time falls between 15 minutes and 30 minutes before start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
+        }
+    }
+    private void adjustShiftStop(Shift s){
+        if(this.ots > s.getStopTimeInMillis(getOriginalTimestamp())) {
+          if(this.ots > s.getStopTimeIntervalInMillis(getOriginalTimestamp())) {
+            if(this.ots > (s.getStartTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000))) {
+                  getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())-(s.getInterval()*60000));
             }
-            else if (this.ots > s.getStopTimeGraceInMillis(getOriginalTimestamp())) {
-                //Time falls within grace period (5 min)
-                getAdjustedTimestamp().setTimeInMillis(s.getStopTimeInMillis(getOriginalTimestamp()));
+            else {
+                getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp()));
             }
-            else if (this.ots > s.getStopTimeDockInMillis(getOriginalTimestamp())) {
-                //Time falls outside of grace period but within 15 minutes after start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots > (s.getStopTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
-                //Time falls between 15 minutes and 30 minutes before start
-                getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
-            }
-                        if(this.ots > s.getStopTimeInMillis(getOriginalTimestamp())) {
+          }
+        }
+        else if (this.ots > s.getStopTimeGraceInMillis(getOriginalTimestamp())) {
+            //Time falls within grace period (5 min)
+            getAdjustedTimestamp().setTimeInMillis(s.getStopTimeInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots > s.getStopTimeDockInMillis(getOriginalTimestamp())) {
+            //Time falls outside of grace period but within 15 minutes after start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots > (s.getStopTimeDockInMillis(getOriginalTimestamp())+(s.getDock()*60000))) {
+            //Time falls between 15 minutes and 30 minutes before start
+            getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())+(s.getDock()*60000));
+        }
+        if(this.ots < s.getStopTimeInMillis(getOriginalTimestamp())) {
             if(this.ots < s.getStopTimeIntervalInMillis(getOriginalTimestamp())) {
                 if(this.ots < (s.getStartTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000))) {
                     getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())+(s.getInterval()*60000));
@@ -225,23 +233,30 @@ public class Punch {
                 else {
                     getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp()));
                 }
-                }
-            }
-            else if (this.ots < s.getStopTimeGraceInMillis(getOriginalTimestamp())) {
-                //Time falls within grace period (5 min)
-                getAdjustedTimestamp().setTimeInMillis(s.getStopTimeInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < s.getStopTimeDockInMillis(getOriginalTimestamp())) {
-                //Time falls outside of grace period but within 15 minutes after start
-                getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-            }
-            else if (this.ots < (s.getStopTimeDockInMillis(getOriginalTimestamp())-(s.getDock()*60000))) {
-                //Time falls between 15 minutes and 30 minutes before start
-                getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())-(s.getDock()*60000));
             }
         }
+        else if (this.ots < s.getStopTimeGraceInMillis(getOriginalTimestamp())) {
+            //Time falls within grace period (5 min)
+            getAdjustedTimestamp().setTimeInMillis(s.getStopTimeInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < s.getStopTimeDockInMillis(getOriginalTimestamp())) {
+            //Time falls outside of grace period but within 15 minutes after start
+            getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots < (s.getStopTimeDockInMillis(getOriginalTimestamp())-(s.getDock()*60000))) {
+            //Time falls between 15 minutes and 30 minutes before start
+            getAdjustedTimestamp().setTimeInMillis(s.getStopTimeIntervalInMillis(getOriginalTimestamp())-(s.getDock()*60000));
+        }
+    }
+    private void adjustLunchStart(Shift s){
+        if(this.ots < s.getStopTimeInMillis(getOriginalTimestamp())) {
+            //if()
+        } 
     }
     
+    private void adjustLunchStop(Shift s){
+    
+    }
     public String printAdjustedTimestamp() {
         return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
                 (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getAdjustedTimestamp().getTime());
