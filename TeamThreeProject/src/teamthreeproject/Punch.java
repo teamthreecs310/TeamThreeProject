@@ -163,6 +163,31 @@ public class Punch {
         }  
     }
     
+    public void lunchStart(Shift s) {
+        
+        if (this.ots < s.getLunchStartInMillis(getOriginalTimestamp())) {
+            //Check if they clock out early for lunch 
+          getAdjustedTimestamp().setTimeInMillis(s.getLunchStartInMillis(getOriginalTimestamp()));
+        }    
+        else if (this.ots > s.getLunchStartInMillis(getOriginalTimestamp()) && this.ots < (s.getLunchStartInMillis(getOriginalTimestamp()) + (s.getInterval() * 60000))) {
+            //Check if they clock out late for lunch 
+          getAdjustedTimestamp().setTimeInMillis(s.getLunchStartInMillis(getOriginalTimestamp()));
+        }
+        
+        
+    }
+    
+    public void lunchStop(Shift s) {
+        
+        if (this.ots < s.getLunchStopInMillis(getOriginalTimestamp()) && this.ots > s.getLunchStartInMillis(getOriginalTimestamp()) + (s.getInterval() * 60000)) {
+           //Check if they clocked back in before their lunch stop
+          getAdjustedTimestamp().setTimeInMillis(s.getLunchStopInMillis(getOriginalTimestamp()));
+        }
+        else if (this.ots > s.getLunchStopInMillis(getOriginalTimestamp())) {
+           //Check if they clocked back in after their lunch stop  
+          getAdjustedTimestamp().setTimeInMillis(s.getLunchStopInMillis(getOriginalTimestamp()));
+        }
+    }
     
     
     public String printAdjustedTimestamp() {
