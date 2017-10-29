@@ -144,7 +144,7 @@ public class Shift {
     //sets the year/month/date of Shift lunch stop rules to original timestamp's and returns as Long timestamp rule
     public Long getLunchStopInMillis(GregorianCalendar ots) {
         l_stop.set(ots.get(GregorianCalendar.YEAR), ots.get(GregorianCalendar.MONTH), ots.get(GregorianCalendar.DATE));
-        lunch_stop_IM = l_start.getTimeInMillis();
+        lunch_stop_IM = l_stop.getTimeInMillis();
         return lunch_stop_IM;
     }
     
