@@ -196,7 +196,7 @@ public class Punch {
             else if (this.ots < s.getStartTimeDockInMillis(getOriginalTimestamp())) {
                 //Time falls outside of grace period but within 15 minutes after start and is pushed ahead
                 getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-                event_data = "(Shift Start(Dock))";
+                event_data = "(Shift Start)";
             }
             else {
                 //Time is more than 15 minutes after start of shift and is rounded to nearest 15 minute interval
@@ -232,7 +232,7 @@ public class Punch {
             else if (this.ots > s.getStopTimeDockInMillis(getOriginalTimestamp())) {
                 //Time falls outside of grace period but within 15 minutes before shift stop and gets pushed back
                 getAdjustedTimestamp().setTimeInMillis(s.getStopTimeDockInMillis(getOriginalTimestamp()));
-                event_data = "(Shift Stop(Dock)";
+                event_data = "(Shift Stop)";
             }
             else {
                 //Time is more than 15 minutes before end of shift and gets rounded to nearest interval
