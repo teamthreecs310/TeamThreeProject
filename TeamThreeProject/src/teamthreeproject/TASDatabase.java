@@ -35,13 +35,13 @@ public class TASDatabase {
         
         try{
             prepstate = conn.prepareStatement("SELECT id, terminalid, badgeid, unix_timestamp(originaltimestamp) AS ots,"
-                                            + "eventtypeid FROM event WHERE id = ?");
+                                            + "eventtypeid, eventdata FROM event WHERE id = ?");
             prepstate.setInt(1,id);
             result = prepstate.executeQuery();
             if(result != null){
                 result.next();
                 punch = new Punch(id, result.getInt("terminalid"), result.getString("badgeid"), 
-                                  result.getLong("ots"), result.getInt("eventtypeid"));
+                                  result.getLong("ots"), result.getInt("eventtypeid"), result.getString("eventdata"));
             }
             result.close();
             prepstate.close();

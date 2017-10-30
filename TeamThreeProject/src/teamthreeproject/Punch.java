@@ -21,14 +21,14 @@ public class Punch {
     private int mod;
     
     //Constructor for retrieving existing punches in the database
-    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id){
+    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id, String event_data){
         this.punch_id = id;
         this.terminal_id = terminal_id;
         this.badge_id = badge_id;
         this.ots = ots*1000;
         this.event_type_id = event_type_id;
         original_time_stamp.setTime(new Date(this.ots));
-        //this.event_data = event_data;
+        this.event_data = event_data;
     }
     
     //Constructor for inserting new punches into the database
