@@ -77,10 +77,11 @@ public class TASDatabase {
        return punchid;
     }
     
-    public void insertAdjusted(GregorianCalendar ats) {
+    public void insertAdjusted(GregorianCalendar ats, int id) {
         try {          
-           prepstate = conn.prepareStatement("INSERT INTO event(eventdata) VALUES (?)");
+           prepstate = conn.prepareStatement("INSERT INTO event(eventdata) VALUES (?) WHERE id = ?");
            prepstate.setString(1, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(ats.getTime()));
+           prepstate.setInt(2,id);
            prepstate.executeUpdate();
            prepstate.close();
        }

@@ -145,7 +145,7 @@ public class Punch {
             }
         }
         
-        db.insertAdjusted(getAdjustedTimestamp());
+        db.insertAdjusted(getAdjustedTimestamp(), this.punch_id);
         
     }
     
