@@ -13,6 +13,7 @@ public class Punch {
     private int event_type_id;
     private String badge_id;
     private Long ots;
+    //private Long ats;
     private GregorianCalendar original_time_stamp = new GregorianCalendar();
     private GregorianCalendar adjusted_time_stamp = new GregorianCalendar();
     private String event_data;
@@ -29,6 +30,7 @@ public class Punch {
         this.event_type_id = event_type_id;
         original_time_stamp.setTime(new Date(this.ots));
         this.event_data = event_data;
+        //this.ats = ats*1000;
     }
     
     //Constructor for inserting new punches into the database
@@ -117,6 +119,8 @@ public class Punch {
     
     public void adjust(Shift s) {
         
+        TASDatabase db = new TASDatabase();
+        
         if (getDay() == "SAT" || getDay() == "SUN") {
             //interval rounding for weekend shifts
             intervalRounding(s);
@@ -139,7 +143,10 @@ public class Punch {
                     adjustShiftStop(s);
                 }
             }
-        }    
+        }
+        
+        db.insertAdjusted(getAdjustedTimestamp());
+        
     }
     
     public void intervalRounding(Shift s){

@@ -1,6 +1,8 @@
 
 package teamthreeproject;
 
+import java.text.SimpleDateFormat;
+
 /**
  *
  * @author TeamThree
@@ -26,6 +28,11 @@ public class TeamThreeProject {
         System.out.println(p1.printAdjustedTimestamp());
         System.out.println(p2.printOriginalTimestamp());
         System.out.println(p2.printAdjustedTimestamp());
+        
+        Punch p1_new = db.getPunch(4943);
+        Punch p2_new = db.getPunch(5004);
+        
+        System.out.println((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(p1_new.getAdjustedTimestamp().getTime()));
         
         /* testing for adjust END */
         

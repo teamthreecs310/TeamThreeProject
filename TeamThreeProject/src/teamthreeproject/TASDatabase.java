@@ -74,10 +74,19 @@ public class TASDatabase {
        }
        catch(Exception e){}
 
-       //punch.setID(id);
-       System.out.println("Punch ID: "+punchid);
        return punchid;
     }
+    
+    public void insertAdjusted(GregorianCalendar ats) {
+        try {          
+           prepstate = conn.prepareStatement("INSERT INTO event(eventdata) VALUES (?)");
+           prepstate.setString(1, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(ats.getTime()));
+           prepstate.executeUpdate();
+           prepstate.close();
+       }
+       catch(Exception e){}
+    }
+    
     public Shift getShift(int id) {
         ResultSet result;
         Shift shift = null;
