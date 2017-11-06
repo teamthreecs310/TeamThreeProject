@@ -212,7 +212,7 @@ public class Punch {
         }               
     }
     
-    private void adjustShiftStop(Shift s){
+    public void adjustShiftStop(Shift s){
         getAdjustedTimestamp().setTimeInMillis(ots);
         event_data = "(Shift Stop)";
         

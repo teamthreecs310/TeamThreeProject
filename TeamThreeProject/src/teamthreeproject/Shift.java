@@ -148,8 +148,8 @@ public class Shift {
         return lunch_stop_IM;
     }
     
-    //Returns the minimum amount of time an employee must work to get their lunch
-    //time deducted from total time worked
+    //Returns the minimum amount of time an employee must work in a day 
+    //to get their lunch time deducted from total time worked
     public int getLunchDeduct() {
         return lunch_deduct;
     }
