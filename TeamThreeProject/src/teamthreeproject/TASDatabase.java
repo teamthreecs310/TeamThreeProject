@@ -87,6 +87,26 @@ public class TASDatabase {
        }
        catch(Exception e){}
     }
+    public void collectPunch(Punch punch){
+        ArrayList<Punch> punches = new ArrayList<Punch>();
+        GregorianCalendar rs = null;
+        Long temp;
+        String badgeID = punch.getBadgeID();
+        GregorianCalendar timestamp = punch.getAdjustedTimestamp();
+        String day = punch.getDay();
+        try{
+            prepstate = conn.prepareStatement("SELECT * FROM event WHERE badge = ?");
+            prepstate.setString(1, badgeID);
+            result = prepstate.executeQuery();
+            while (result.next()){
+              Punch collectedPunch = new Punch(result.getInt("id"), result.getInt("terminalid"),
+                                        result.getString("badgeid"), );
+               
+            }
+        }
+        catch(Exception e){}
+        
+    }
     
     public Shift getShift(int id) {
         ResultSet result;
