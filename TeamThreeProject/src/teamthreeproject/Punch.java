@@ -13,6 +13,7 @@ public class Punch {
     private int event_type_id;
     private String badge_id;
     private Long ots;
+    private Long ats;
     private GregorianCalendar original_time_stamp = new GregorianCalendar();
     private GregorianCalendar adjusted_time_stamp = new GregorianCalendar();
     private String event_data;
@@ -31,6 +32,20 @@ public class Punch {
         this.event_type_id = event_type_id;
         original_time_stamp.setTime(new Date(this.ots));
         this.event_data = event_data;
+        
+    }
+    //Constructor needed for the collectPunch method
+    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id, String event_data,
+                  long ats){
+        this.punch_id = id;
+        this.terminal_id = terminal_id;
+        this.badge_id = badge_id;
+        this.ots = ots*1000;
+        this.event_type_id = event_type_id;
+        original_time_stamp.setTime(new Date(this.ots));
+        this.event_data = event_data;
+        this.ats = ats*1000;
+        adjusted_time_stamp.setTime(new Date(this.ats));
         
     }
     

@@ -95,17 +95,29 @@ public class TASDatabase {
         GregorianCalendar timestamp = punch.getAdjustedTimestamp();
         String day = punch.getDay();
         try{
-            prepstate = conn.prepareStatement("SELECT * FROM event WHERE badge = ?");
+            prepstate = conn.prepareStatement("SELECT *, unix_timestamp(originaltimestamp)"
+                    + "AS ots, unix_timestamp(adjustedtimestamp) as ats FROM event WHERE badge = ?");
             prepstate.setString(1, badgeID);
             result = prepstate.executeQuery();
             while (result.next()){
               Punch collectedPunch = new Punch(result.getInt("id"), result.getInt("terminalid"),
-                                        result.getString("badgeid"), );
+                                        result.getString("badgeid"), result.getLong("ots"),
+                                        result.getInt("eventtypeid"), result.getString("eventdata"),
+                                        result.getLong("ats"));
+              punches.add(collectedPunch);
                
             }
         }
         catch(Exception e){}
         
+    }
+    private ArrayList<Punch> comparePunch(ArrayList<Punch> punches, Punch punch){
+        for(int i = 0; i < punches.size(); i++){
+            if(punch.getDay() != punches.get(i).getDay()){
+                punches.remove(i);
+            }
+        }
+        return punches;
     }
     
     public Shift getShift(int id) {
