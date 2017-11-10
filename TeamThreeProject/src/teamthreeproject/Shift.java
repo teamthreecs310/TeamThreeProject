@@ -179,6 +179,10 @@ public class Shift {
         return overtime_threshold;
     }
     
+    public int getLunchLength() {
+        return lunch_length;
+    }
+    
     //Returns entire shift description in proper format string
     @Override
     public String toString() {

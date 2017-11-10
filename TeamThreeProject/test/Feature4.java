@@ -42,7 +42,7 @@ public class Feature4 {
 		
 		/* Compare to Expected Value */
         
-        assertEquals(m, 330);
+        assertEquals(m, 330);  //This can't be right if lunch_deduct is 390 (should be 360)
         
     }
 

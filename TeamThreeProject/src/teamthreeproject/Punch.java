@@ -31,24 +31,9 @@ public class Punch {
         this.ots = ots*1000;
         this.event_type_id = event_type_id;
         original_time_stamp.setTime(new Date(this.ots));
-        this.event_data = event_data;
-        
+        this.event_data = event_data;       
     }
-    //Constructor needed for the collectPunch method
-    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id, String event_data,
-                  long ats){
-        this.punch_id = id;
-        this.terminal_id = terminal_id;
-        this.badge_id = badge_id;
-        this.ots = ots*1000;
-        this.event_type_id = event_type_id;
-        original_time_stamp.setTime(new Date(this.ots));
-        this.event_data = event_data;
-        this.ats = ats*1000;
-        adjusted_time_stamp.setTime(new Date(this.ats));
-        
-    }
-    
+   
     //Constructor for inserting new punches into the database
     public Punch(String badgeid, int terminalid, int punchtypeid) {
         this.original_time_stamp = new GregorianCalendar();
@@ -59,15 +44,15 @@ public class Punch {
         this.event_type_id = punchtypeid;
         this.event_data = null;
     }
-    public void setID(int id){
-        this.punch_id = id;
-    }
+
     public int getID(){
         return punch_id;
     }
+    
     public int getTerminalID(){
         return terminal_id;
     }
+    
     public String getBadgeID(){
         return badge_id;
     }
@@ -116,8 +101,7 @@ public class Punch {
     public String getEventData(){
         return event_data;
     }
-    
-    
+       
     public String getEventType(int event_type_id) {
         switch (event_type_id) {
             case 0:
@@ -128,11 +112,13 @@ public class Punch {
                 return "TIMED OUT: ";
         }
     }
+    
     public String printOriginalTimestamp(){
         return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
                 (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getOriginalTimestamp().getTime());
     }
     
+    //method for adjusting a punch's timestamp given the necessary shift rules
     public void adjust(Shift s) {
         
         TASDatabase db = new TASDatabase();
@@ -161,10 +147,11 @@ public class Punch {
             }
         }
         
-        db.insertAdjusted(getAdjustedTimestamp(), this.punch_id);
+        db.insertAdjusted(getAdjustedTimestamp(), getID(), getEventData());
         
     }
     
+    //Method for rounding timestamps to nearest interval if outside of shift rules
     public void intervalRounding(Shift s){
         unrounded_min = getOriginalTimestamp().get(Calendar.MINUTE);
         seconds = getOriginalTimestamp().get(Calendar.SECOND);
@@ -193,6 +180,7 @@ public class Punch {
             event_data = "(Interval Round)";
         }
     }
+    
     public void adjustShiftStart(Shift s){
         getAdjustedTimestamp().setTimeInMillis(ots);
         event_data = "(Shift Start)";
@@ -274,8 +262,7 @@ public class Punch {
             //Check if they clock out late for lunch 
           getAdjustedTimestamp().setTimeInMillis(s.getLunchStartInMillis(getOriginalTimestamp()));
         }
-        
-        
+               
     }
     
     public void adjustLunchStop(Shift s) {

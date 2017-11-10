@@ -13,23 +13,29 @@ public class TASDatabase {
     private Statement state;
     private PreparedStatement prepstate;
     private ResultSet result;
-
+    ArrayList<Punch> badge_punches = new ArrayList<Punch>();
+    ArrayList<Punch> day_punches = new ArrayList<Punch>();
+    
+    //establish a database connection
     public TASDatabase(){
         try{
             Class.forName("com.mysql.jdbc.Driver").newInstance();
             String url = "jdbc:mysql://localhost:3306/tas";
-            String username = "tasuser";//Kept empty for now because we will be Creating a project user 
-            String password = "snellybelly42";//Kept empty for now because we will be Creating a project user                 
+            String username = "tasuser";
+            String password = "snellybelly42";                
             conn = DriverManager.getConnection(url, username, password);
         } catch(Exception e){}
         
     }
     
+    //closes connection
     public void closeConnection() {
         try {
             conn.close();
         } catch (Exception e) {}
     }
+    
+    //method for retrieving a punch's info from the database given the punch ID
     public Punch getPunch(int id){
         Punch punch = null;
         
@@ -49,6 +55,8 @@ public class TASDatabase {
         
         return punch;
     }
+    
+    //method for inserting a new punch into the database
     public int insertPunch(Punch punch) {
         int punchid = 0;
         int result = 0;
@@ -77,49 +85,123 @@ public class TASDatabase {
        return punchid;
     }
     
-    public void insertAdjusted(GregorianCalendar ats, int id) {
+    //method for inserting the adjusted timestamp and event data back into the database after adjusting
+    public void insertAdjusted(GregorianCalendar ats, int id, String event_data) {
         try {          
-           prepstate = conn.prepareStatement("INSERT INTO event(eventdata) VALUES (?) WHERE id = ?");
+           prepstate = conn.prepareStatement("INSERT INTO event(adjustedtimestamp,eventdata) VALUES (?,?) WHERE id = ?");
            prepstate.setString(1, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(ats.getTime()));
-           prepstate.setInt(2,id);
+           prepstate.setString(2, event_data);
+           prepstate.setInt(3,id);
            prepstate.executeUpdate();
            prepstate.close();
        }
        catch(Exception e){}
     }
+    
+    /* finds which shift rules should apply to a given punch based on its first clock-in of the day
+       (currently only tests for 1st and 2nd shift) */
+    public int findShift(Punch p) {  
+        int s = 0;
+        
+        if (p.getOriginalTimestamp().get(Calendar.HOUR_OF_DAY) < 10 && p.getOriginalTimestamp().get(Calendar.HOUR_OF_DAY) >= 5) {
+            s = 1;
+        }
+        else if (p.getOriginalTimestamp().get(Calendar.HOUR_OF_DAY) < 15 && p.getOriginalTimestamp().get(Calendar.HOUR_OF_DAY) >= 10) {
+            s = 2;
+        }
+        
+        return s;
+    }
+    
+    /* Finds which shift the punch passed in belongs to, collects punches with the same Badge ID as that punch and stores them
+       in an ArrayList, finds punches in that list that are on the same day as the punch and adds them to a new list, adjusts all the 
+       timestamps of those punches, and finally totals the minutes worked deducting lunchtime if applicable */
+    public int getMinutesAccrued(Punch p) {
+        int total = 0;
+        int lunch_deduct;
+        long clock_in = 0;
+        long clock_out = 0;
+        long diff = 0;
+        int diff_in_min = 0;
+        boolean lunch_break = false;
+        
+        //find shift rules and collect punches
+        Shift s = getShift(findShift(p));
+        lunch_deduct = s.getLunchDeduct();
+        collectPunch(p);
+        
+        //find punches of the same day and add them to new list
+        for(Punch punch: badge_punches){
+            if((p.getOriginalTimestamp().get(Calendar.MONTH) == punch.getOriginalTimestamp().get(Calendar.MONTH))
+               && (p.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH) == punch.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH))) {
+                day_punches.add(punch);
+            }
+        }
+        
+        //adjust the punches
+        for (Punch punch: day_punches) {
+            punch.adjust(s);
+        }
+        
+        //checks if the employee took a lunch break
+        if (day_punches.size() > 2) {
+            lunch_break = true;
+        }
+        
+        //totals the time worked for the day
+        while (!day_punches.isEmpty()) {
+            switch (day_punches.get(0).getEventTypeID()) {
+                case 1:
+                    clock_in = day_punches.get(0).getAdjustedTimestamp().getTimeInMillis();
+                    day_punches.remove(0);
+                    break;
+                case 0:
+                    clock_out = day_punches.get(0).getAdjustedTimestamp().getTimeInMillis();
+                    diff = (clock_out - clock_in);
+                    diff_in_min = (int) (diff / 60000);
+                    total += diff_in_min;
+                    day_punches.remove(0);
+                    break;
+                case 2:
+                    day_punches.remove(0);
+                    break;
+                default:
+                    break;
+            }
+        }        
+        
+        //checks if lunch_deduct should be applied if the employee did not take a break
+        if ((lunch_break == false) && (total >= lunch_deduct)) {
+            total -= s.getLunchLength();
+        }
+        
+        return total;
+    }
+    
+    //method for collecting all the punches for 1 employee
     public void collectPunch(Punch punch){
-        ArrayList<Punch> punches = new ArrayList<Punch>();
-        GregorianCalendar rs = null;
-        Long temp;
         String badgeID = punch.getBadgeID();
-        GregorianCalendar timestamp = punch.getAdjustedTimestamp();
-        String day = punch.getDay();
+
         try{
             prepstate = conn.prepareStatement("SELECT *, unix_timestamp(originaltimestamp)"
-                    + "AS ots, unix_timestamp(adjustedtimestamp) as ats FROM event WHERE badge = ?");
+                    + "AS ots FROM event WHERE badgeid = ?");
             prepstate.setString(1, badgeID);
             result = prepstate.executeQuery();
-            while (result.next()){
-              Punch collectedPunch = new Punch(result.getInt("id"), result.getInt("terminalid"),
+            while (result != null){
+                result.next();
+                Punch collectedPunch = new Punch(result.getInt("id"), result.getInt("terminalid"),
                                         result.getString("badgeid"), result.getLong("ots"),
-                                        result.getInt("eventtypeid"), result.getString("eventdata"),
-                                        result.getLong("ats"));
-              punches.add(collectedPunch);
+                                        result.getInt("eventtypeid"), result.getString("eventdata"));
+                                        
+                badge_punches.add(collectedPunch);
                
             }
         }
         catch(Exception e){}
         
     }
-    private ArrayList<Punch> comparePunch(ArrayList<Punch> punches, Punch punch){
-        for(int i = 0; i < punches.size(); i++){
-            if(punch.getDay() != punches.get(i).getDay()){
-                punches.remove(i);
-            }
-        }
-        return punches;
-    }
     
+    //method for getting the shift rules of a given shift
     public Shift getShift(int id) {
         ResultSet result;
         Shift shift = null;
@@ -148,6 +230,7 @@ public class TASDatabase {
         return shift;
     }
     
+    //method for getting an employee's name given their badge ID
     public Badge getBadge(String id) {
         ResultSet result;
         Badge badge = null;
