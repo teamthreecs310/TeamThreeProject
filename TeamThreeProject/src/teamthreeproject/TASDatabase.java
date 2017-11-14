@@ -3,6 +3,7 @@ package teamthreeproject;
 import java.sql.*;
 import java.util.*;
 import java.text.*;
+import org.json.simple.*;
 
 /**
  *
@@ -98,6 +99,12 @@ public class TASDatabase {
        catch(Exception e){}
     }
     
+    //Method for retrieving all punches in a day and parsing all the data into a JSON string
+    public String getPunchListAsJSON(Punch p) {
+        
+        return "";
+    }
+    
     /* finds which shift rules should apply to a given punch based on its first clock-in of the day
        (currently only tests for 1st and 2nd shift) */
     public int findShift(Punch p) {  
@@ -128,15 +135,7 @@ public class TASDatabase {
         //find shift rules and collect punches
         Shift s = getShift(findShift(p));
         lunch_deduct = s.getLunchDeduct();
-        collectPunch(p);
-        
-        //find punches of the same day and add them to new list
-        for(Punch punch: badge_punches){
-            if((p.getOriginalTimestamp().get(Calendar.MONTH) == punch.getOriginalTimestamp().get(Calendar.MONTH))
-               && (p.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH) == punch.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH))) {
-                day_punches.add(punch);
-            }
-        }
+        collectPunch(p);     
         
         //adjust the punches
         for (Punch punch: day_punches) {
@@ -178,9 +177,9 @@ public class TASDatabase {
         return total;
     }
     
-    //method for collecting all the punches for 1 employee
-    public void collectPunch(Punch punch){
-        String badgeID = punch.getBadgeID();
+    //method for collecting all the punches for 1 employee in a day
+    private ArrayList<Punch> collectPunch(Punch p){
+        String badgeID = p.getBadgeID();
 
         try{
             prepstate = conn.prepareStatement("SELECT *, unix_timestamp(originaltimestamp)"
@@ -199,6 +198,14 @@ public class TASDatabase {
         }
         catch(Exception e){}
         
+        //find punches of the same day and add them to new list
+        for(Punch dayp: badge_punches){
+            if((p.getOriginalTimestamp().get(Calendar.MONTH) == dayp.getOriginalTimestamp().get(Calendar.MONTH))
+               && (p.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH) == dayp.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH))) {
+                day_punches.add(dayp);
+            }
+        }
+        return day_punches;
     }
     
     //method for getting the shift rules of a given shift
