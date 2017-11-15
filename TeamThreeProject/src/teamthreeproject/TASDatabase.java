@@ -16,6 +16,7 @@ public class TASDatabase {
     private ResultSet result;
     ArrayList<Punch> badge_punches = new ArrayList<Punch>();
     ArrayList<Punch> day_punches = new ArrayList<Punch>();
+    ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();    
     
     //establish a database connection
     public TASDatabase(){
@@ -101,6 +102,12 @@ public class TASDatabase {
     
     //Method for retrieving all punches in a day and parsing all the data into a JSON string
     public String getPunchListAsJSON(Punch p) {
+        collectPunch(p);
+        
+        for (Punch dayp: day_punches) {
+            HashMap<String, String>  punchData = new HashMap<>();
+            //use getters and insert punch data into hash maps
+        }
         
         return "";
     }
