@@ -24,11 +24,14 @@ public class Punch {
     private int seconds;
     
     //Constructor for retrieving existing punches in the database
-    public Punch(int id, int terminal_id, String badge_id, long ots, int event_type_id, String event_data){
+    public Punch(int id, int terminal_id, String badge_id, Long ots, int event_type_id, String event_data, Long ats){
         this.punch_id = id;
         this.terminal_id = terminal_id;
         this.badge_id = badge_id;
         this.ots = ots*1000;
+        if (ats != null) {
+            this.ats = ats*1000;
+        }
         this.event_type_id = event_type_id;
         original_time_stamp.setTime(new Date(this.ots));
         this.event_data = event_data;       
@@ -37,8 +40,8 @@ public class Punch {
     //Constructor for inserting new punches into the database
     public Punch(String badgeid, int terminalid, int punchtypeid) {
         this.original_time_stamp = new GregorianCalendar();
-        adjusted_time_stamp = null;
-        punch_id = 0;
+        this.adjusted_time_stamp = null;
+        this.punch_id = 0;
         this.badge_id = badgeid;
         this.terminal_id = terminalid;
         this.event_type_id = punchtypeid;
@@ -55,6 +58,14 @@ public class Punch {
     
     public String getBadgeID(){
         return badge_id;
+    }
+    
+    public Long getOTS() {
+        return this.ots;
+    }
+    
+    public Long getATS() {
+        return this.ats;
     }
     
     public GregorianCalendar getOriginalTimestamp() {
@@ -165,25 +176,25 @@ public class Punch {
         getAdjustedTimestamp().setTimeInMillis(ots);
         
         if (mod == 0) {
-            event_data = "(None)";
+            event_data = "None";
         }
         else if (mod < 8) {
             getAdjustedTimestamp().set(Calendar.MINUTE, rounded_min - mod);
             getAdjustedTimestamp().set(Calendar.SECOND, 0);
             getAdjustedTimestamp().set(Calendar.MILLISECOND, 0);
-            event_data = "(Interval Round)";
+            event_data = "Interval Round";
         }
         else {
             getAdjustedTimestamp().set(Calendar.MINUTE, (rounded_min + (s.getInterval() - mod)));
             getAdjustedTimestamp().set(Calendar.SECOND, 0);
             getAdjustedTimestamp().set(Calendar.MILLISECOND, 0); 
-            event_data = "(Interval Round)";
+            event_data = "Interval Round";
         }
     }
     
     public void adjustShiftStart(Shift s){
         getAdjustedTimestamp().setTimeInMillis(ots);
-        event_data = "(Shift Start)";
+        event_data = "Shift Start";
         
         if (this.ots < s.getStartTimeInMillis(getOriginalTimestamp())) {
             //Time is before shift start
@@ -206,7 +217,7 @@ public class Punch {
             else if (this.ots <= s.getStartTimeDockInMillis(getOriginalTimestamp())) {
                 //Time falls outside of grace period but within 15 minutes after start and is pushed ahead
                 getAdjustedTimestamp().setTimeInMillis(s.getStartTimeDockInMillis(getOriginalTimestamp()));
-                event_data = "(Shift Dock)";
+                event_data = "Shift Dock";
             }
             else {
                 //Time is more than 15 minutes after start of shift and is rounded to nearest 15 minute interval
@@ -217,7 +228,7 @@ public class Punch {
     
     public void adjustShiftStop(Shift s){
         getAdjustedTimestamp().setTimeInMillis(ots);
-        event_data = "(Shift Stop)";
+        event_data = "Shift Stop";
         
         if (this.ots > s.getStopTimeInMillis(getOriginalTimestamp())) {
             //Time is after shift stop
@@ -240,7 +251,7 @@ public class Punch {
             else if (this.ots >= s.getStopTimeDockInMillis(getOriginalTimestamp())) {
                 //Time falls outside of grace period but within 15 minutes before shift stop and gets pushed back
                 getAdjustedTimestamp().setTimeInMillis(s.getStopTimeDockInMillis(getOriginalTimestamp()));
-                event_data = "(Shift Dock)";
+                event_data = "Shift Dock";
             }
             else {
                 //Time is more than 15 minutes before end of shift and gets rounded to nearest interval
@@ -251,7 +262,7 @@ public class Punch {
            
     public void adjustLunchStart(Shift s) {
         getAdjustedTimestamp().setTimeInMillis(ots);
-        event_data = "(Lunch Start)";
+        event_data = "Lunch Start";
         
         if (this.ots < s.getLunchStartInMillis(getOriginalTimestamp())) {
             //Check if they clock out early for lunch 
@@ -267,7 +278,7 @@ public class Punch {
     
     public void adjustLunchStop(Shift s) {
         getAdjustedTimestamp().setTimeInMillis(ots);
-        event_data = "(Lunch Stop)";
+        event_data = "Lunch Stop";
         
         if (this.ots < s.getLunchStopInMillis(getOriginalTimestamp()) && 
             this.ots > s.getLunchStartInMillis(getOriginalTimestamp()) + (s.getInterval() * 60000)) {
@@ -283,7 +294,7 @@ public class Punch {
     
     public String printAdjustedTimestamp() {
         return "#" + badge_id + " " + getEventType(event_type_id) + getDay() +
-                (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getAdjustedTimestamp().getTime()) + " " + event_data;
+                (new SimpleDateFormat(" MM/dd/yyyy HH:mm:ss")).format(getAdjustedTimestamp().getTime()) + " " + "(" + event_data + ")";
     }
     
     

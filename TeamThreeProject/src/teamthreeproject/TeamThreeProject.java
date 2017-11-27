@@ -15,7 +15,11 @@ public class TeamThreeProject {
         
         TASDatabase db = new TASDatabase();
         
-        //Testing code here
+        Punch p = db.getPunch(3634);
+        
+        String json = db.getPunchListAsJSON(p);
+        
+        System.out.print(json);
         
         db.closeConnection();
     

@@ -16,7 +16,8 @@ public class TASDatabase {
     private ResultSet result;
     ArrayList<Punch> badge_punches = new ArrayList<Punch>();
     ArrayList<Punch> day_punches = new ArrayList<Punch>();
-    ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();    
+    ArrayList<HashMap<String, String>> jsonData = new ArrayList<HashMap<String, String>>();
+    HashMap<String, String> totalMinutes = new HashMap<String, String>();
     
     //establish a database connection
     public TASDatabase(){
@@ -43,13 +44,13 @@ public class TASDatabase {
         
         try{
             prepstate = conn.prepareStatement("SELECT id, terminalid, badgeid, unix_timestamp(originaltimestamp) AS ots,"
-                                            + "eventtypeid, eventdata FROM event WHERE id = ?");
+                                            + "eventtypeid, eventdata, unix_timestamp(adjustedtimestamp) AS ats FROM event WHERE id = ?");
             prepstate.setInt(1,id);
             result = prepstate.executeQuery();
-            if(result != null){
+            while (result != null) {
                 result.next();
                 punch = new Punch(id, result.getInt("terminalid"), result.getString("badgeid"), 
-                                  result.getLong("ots"), result.getInt("eventtypeid"), result.getString("eventdata"));
+                                  result.getLong("ots"), result.getInt("eventtypeid"), result.getString("eventdata"), result.getLong("ats"));
             }
             result.close();
             prepstate.close();
@@ -90,7 +91,7 @@ public class TASDatabase {
     //method for inserting the adjusted timestamp and event data back into the database after adjusting
     public void insertAdjusted(GregorianCalendar ats, int id, String event_data) {
         try {          
-           prepstate = conn.prepareStatement("INSERT INTO event(adjustedtimestamp,eventdata) VALUES (?,?) WHERE id = ?");
+           prepstate = conn.prepareStatement("UPDATE event SET adjustedtimestamp = ?, eventdata = ? WHERE id = ?");
            prepstate.setString(1, (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(ats.getTime()));
            prepstate.setString(2, event_data);
            prepstate.setInt(3,id);
@@ -102,14 +103,40 @@ public class TASDatabase {
     
     //Method for retrieving all punches in a day and parsing all the data into a JSON string
     public String getPunchListAsJSON(Punch p) {
-        collectPunch(p);
         
+        //get total minutes
+        int total = getMinutesAccrued(p);
+        
+        //clear list and collect punches
+        day_punches.clear();
+        day_punches = collectPunch(p);
+                       
         for (Punch dayp: day_punches) {
-            HashMap<String, String>  punchData = new HashMap<>();
-            //use getters and insert punch data into hash maps
+            HashMap<String, String> punchData = new HashMap<>();
+            
+            //insert data for each punch into HashMap
+            punchData.put("id", String.valueOf(dayp.getID()));
+            punchData.put("badgeid", dayp.getBadgeID());
+            punchData.put("terminalid", String.valueOf(dayp.getTerminalID()));
+            punchData.put("eventtypeid", String.valueOf(dayp.getEventTypeID()));
+            punchData.put("eventdata", dayp.getEventData());
+            punchData.put("originaltimestamp", String.valueOf(dayp.getOTS()));
+            punchData.put("adjustedtimestamp", String.valueOf(dayp.getATS()));
+            
+            //append the HashMap to the ArrayList
+            jsonData.add(punchData);
         }
         
-        return "";
+        //add total minutes value and key to HashMap
+        totalMinutes.put("totalminutes", String.valueOf(total));
+        
+        //append the total HashMap to the end of the ArrayList
+        jsonData.add(totalMinutes);
+        
+        //flatten the data into a JSON string
+        String json = JSONValue.toJSONString(jsonData);
+        
+        return json;
     }
     
     /* finds which shift rules should apply to a given punch based on its first clock-in of the day
@@ -142,7 +169,7 @@ public class TASDatabase {
         //find shift rules and collect punches
         Shift s = getShift(findShift(p));
         lunch_deduct = s.getLunchDeduct();
-        collectPunch(p);     
+        day_punches = collectPunch(p);     
         
         //adjust the punches
         for (Punch punch: day_punches) {
@@ -187,18 +214,20 @@ public class TASDatabase {
     //method for collecting all the punches for 1 employee in a day
     private ArrayList<Punch> collectPunch(Punch p){
         String badgeID = p.getBadgeID();
+        badge_punches.clear();
+        day_punches.clear();
 
         try{
             prepstate = conn.prepareStatement("SELECT *, unix_timestamp(originaltimestamp)"
-                    + "AS ots FROM event WHERE badgeid = ?");
+                    + "AS ots, unix_timestamp(adjustedtimestamp) AS ats FROM event WHERE badgeid = ?");
             prepstate.setString(1, badgeID);
             result = prepstate.executeQuery();
             while (result != null){
                 result.next();
                 Punch collectedPunch = new Punch(result.getInt("id"), result.getInt("terminalid"),
                                         result.getString("badgeid"), result.getLong("ots"),
-                                        result.getInt("eventtypeid"), result.getString("eventdata"));
-                                        
+                                        result.getInt("eventtypeid"), result.getString("eventdata"), result.getLong("ats"));
+                
                 badge_punches.add(collectedPunch);
                
             }
@@ -206,12 +235,13 @@ public class TASDatabase {
         catch(Exception e){}
         
         //find punches of the same day and add them to new list
-        for(Punch dayp: badge_punches){
-            if((p.getOriginalTimestamp().get(Calendar.MONTH) == dayp.getOriginalTimestamp().get(Calendar.MONTH))
-               && (p.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH) == dayp.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH))) {
-                day_punches.add(dayp);
+        for(Punch badgep: badge_punches){
+            if((p.getOriginalTimestamp().get(Calendar.MONTH) == badgep.getOriginalTimestamp().get(Calendar.MONTH))
+               && (p.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH) == badgep.getOriginalTimestamp().get(Calendar.DAY_OF_MONTH))) {
+                day_punches.add(badgep);
             }
         }
+        
         return day_punches;
     }
     
