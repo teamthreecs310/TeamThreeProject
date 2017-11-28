@@ -166,14 +166,15 @@ public class TASDatabase {
         int diff_in_min = 0;
         boolean lunch_break = false;
         
-        //find shift rules and collect punches
-        Shift s = getShift(findShift(p));
-        lunch_deduct = s.getLunchDeduct();
+        //find shift rules and collect punches       
         day_punches = collectPunch(p);     
+        Shift s = getShift(findShift(day_punches.get(0)));
+        lunch_deduct = s.getLunchDeduct();
         
         //adjust the punches
         for (Punch punch: day_punches) {
             punch.adjust(s);
+            System.out.println(punch.printAdjustedTimestamp());
         }
         
         //checks if the employee took a lunch break

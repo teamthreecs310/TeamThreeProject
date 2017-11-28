@@ -15,11 +15,9 @@ public class TeamThreeProject {
         
         TASDatabase db = new TASDatabase();
         
-        Punch p = db.getPunch(3634);
+        Punch p = db.getPunch(4017);
         
-        String json = db.getPunchListAsJSON(p);
-        
-        System.out.print(json);
+        int total = db.getMinutesAccrued(p);
         
         db.closeConnection();
     
