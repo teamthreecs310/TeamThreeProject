@@ -174,7 +174,6 @@ public class TASDatabase {
         //adjust the punches
         for (Punch punch: day_punches) {
             punch.adjust(s);
-            System.out.println(punch.printAdjustedTimestamp());
         }
         
         //checks if the employee took a lunch break
